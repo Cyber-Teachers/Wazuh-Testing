@@ -1,0 +1,13 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends openssh-server \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -s /bin/bash debian && echo 'debian:debian' | chpasswd
+
+RUN mkdir -p /run/sshd && ssh-keygen -A \
+    && sed -i 's/#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
